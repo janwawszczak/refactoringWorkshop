@@ -5,7 +5,7 @@
 
 #include "EventT.hpp"
 #include "IPort.hpp"
-
+using namespace Snake;
 namespace Snake
 {
 ConfigurationError::ConfigurationError()
@@ -62,9 +62,12 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
         throw ConfigurationError();
     }
 }
+}
+
 
 void Controller::receive(std::unique_ptr<Event> e)
 {
+
     try {
         auto const& timerEvent = *dynamic_cast<EventT<TimeoutInd> const&>(*e);
 
@@ -106,9 +109,6 @@ void Controller::receive(std::unique_ptr<Event> e)
                     }
                 }
             }
-        }
-
-        if (not lost) {
             m_segments.push_front(newHead);
             DisplayInd placeNewHead;
             placeNewHead.x = newHead.x;
@@ -123,7 +123,10 @@ void Controller::receive(std::unique_ptr<Event> e)
                     m_segments.end(),
                     [](auto const& segment){ return not (segment.ttl > 0); }),
                 m_segments.end());
+
         }
+
+
     } catch (std::bad_cast&) {
         try {
             auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;
@@ -192,4 +195,3 @@ void Controller::receive(std::unique_ptr<Event> e)
     }
 }
 
-} // namespace Snake
